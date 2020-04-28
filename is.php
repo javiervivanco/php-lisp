@@ -66,8 +66,9 @@ class is
     {
         return !is_string($obj) && is_numeric($obj);
     }
-    static function empty($seq):bool { return $seq->count() === 0; }
-                static function nil($obj) : bool
+    static function empty($seq):bool { 
+        return $seq->count() === 0; }
+    static function nil($obj) : bool
     {
         return $obj === null;
     }

@@ -145,6 +145,7 @@ function read_form(Reader $reader)
             );
         case Token::UNQUOTE:
         case Token::UNQUOTE_1:
+        case Token::UNQUOTE_2:
             $reader->next();
             return create::list(
                 create::symbol(SpecialForm::UNQUOTE),
@@ -152,6 +153,7 @@ function read_form(Reader $reader)
             );
         case Token::SPLICE_UNQUOTE:
         case Token::SPLICE_UNQUOTE_1:
+        case Token::SPLICE_UNQUOTE_2:
 
             $reader->next();
             return create::list(

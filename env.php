@@ -23,7 +23,7 @@ class Env {
         }
 
         for ($i=0; $i<count($binds); $i++) {
-            if ($binds[$i]->value === Token::VARIADIC or $binds[$i]->value ===Token::VARIADIC_1) {
+            if (in_array($binds[$i]->value, [Token::VARIADIC, Token::VARIADIC_1, Token::VARIADIC_2])) {
                 $this->bind_exprs($binds[$i+1]->value,$exprs,$i);
                 break;
             } else {
