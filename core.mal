@@ -1,0 +1,76 @@
+(debug 1)
+(def! not (fn* (a) (if a false true)))
+(def! else (symbol "else"))
+(def! last (fn* (l) (nth l (- (count l) 1))))
+
+(def! car first)
+(def! cdr rest)
+(def! caar (fn* (l) (first (first l))))
+(def! cdar (fn* (l) (rest (first l))))
+(def! cdaar (fn* (l) (rest (caar l))))
+
+(def! cadr (fn* (l) (first (rest l))))
+(defmacro! else? (fn* ( & conds) 
+    (if (> (count (filter (fn* (item)(= else (first item))) conds)) 0)
+             'true
+             'false)))
+
+(defmacro! else-last? (fn* ( & conds)  (if (= else (first (last conds))) 'true 'false)))
+
+(defmacro! cond (fn* (& xs) 
+    (if (> (count xs) 0) 
+        (list 'if (first xs) 
+            (if (> (count xs) 1) 
+                (nth xs 1) 
+                (throw "odd number of forms to cond")) 
+            (cons 'cond (rest (rest xs)))))))
+
+
+
+ (defmacro! cond1 (fn* (... args)
+ (if (> (count args) 0)
+     (let* 
+         (
+         check (if (apply else? args) (if (not (apply else-last? args)) (throw ( str else " clause must be last"))))
+         first-cond  (caar args)
+         first-eval (car (cdar args))
+         first-eval-nil? (nil? first-eval)
+         first-eval-not-nil? (not first-eval-nil?)
+         rest-cond (apply cond1 (rest args))
+         )
+         (list 'if first-cond 
+                     (if first-eval-nil? first-cond first-eval)
+                     (if first-eval-not-nil? rest-cond))))))
+         
+ (defmacro! define 
+     (lambda (name_args & body)
+         (cond1
+             [(sequential? name_args) (let* (name (car name_args) args (rest name_args) )
+                                         `(def! %name (fn* %args (begin %@body)))) ]
+             [else `(def! %name_args %@body)]
+             )))
+ 
+(define (zero? n) (= n 0)  )
+(define (odd? n) (if (zero? n) #f (even? (- n 1))) )
+(define (even? n) (if (zero? n) #t (odd? (- n 1))) )
+
+
+
+
+
+(define (newline) (println) ) 
+
+
+
+(defmacro! macro!
+    (lambda (name_args & body)
+        (cond1
+            [(not (sequential? name_args))  (let* (error (str name_args " is not a sequencial")) (throw error) ) ]
+            [else (let* (name_macro (car name_args) args (rest name_args) )
+            `(defmacro! %name_macro (fn* %args (begin %@body))))]
+            )))
+(def! append (lambda [l1 & l2]  
+  ;; this is just the two argument version
+    (if (empty? l1)
+        l2
+        (cons (car l1) (apply append (cons (cdr l1) l2))))))
